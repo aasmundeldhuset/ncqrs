@@ -26,8 +26,7 @@ namespace CommandService.Properties {
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.SpecialSettingAttribute(global::System.Configuration.SpecialSetting.ConnectionString)]
-        [global::System.Configuration.DefaultSettingValueAttribute("Data Source=.\\sqlexpress;Initial Catalog=MyNotesEventStore;Integrated Security=SS" +
-            "PI;")]
+        [global::System.Configuration.DefaultSettingValueAttribute("Data Source=(local);Initial Catalog=MyNotesEventStore;Integrated Security=SSPI;")]
         public string SqlEventStoreConnectionString {
             get {
                 return ((string)(this["SqlEventStoreConnectionString"]));

@@ -18,6 +18,7 @@ namespace CommandService
 
         public void CreateNewNote(CreateNewNote command)
         {
+            command.NoteId = Guid.NewGuid();
             _service.Execute(command);
         }
 

@@ -8,13 +8,18 @@ namespace Events
     {
         public Guid NoteId
         {
-            get; set;
+            get { return EventSourceId; }
         }
 
         public String NewText
         {
             get;
             set;
+        }
+
+        public NoteTextChanged()
+        {
+            
         }
     }
 }
