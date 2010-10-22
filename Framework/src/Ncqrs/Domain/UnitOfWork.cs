@@ -93,7 +93,7 @@ namespace Ncqrs.Domain
         private void AggregateRootEventAppliedHandler(object sender, Eventing.Sourcing.EventAppliedArgs e)
         {
             var aggregateRoot = (AggregateRoot) sender;
-            RegisterDirtyInstance(aggregateRoot);
+            Current.RegisterDirtyInstance(aggregateRoot);
         }
 
         [ContractInvariantMethod]
