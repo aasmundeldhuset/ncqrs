@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.SqlClient;
 using System.Diagnostics.Contracts;
 using System.IO;
@@ -105,7 +106,7 @@ namespace Ncqrs.Eventing.Storage.SQL
                 // Open connection and begin a transaction so we can
                 // commit or rollback all the changes that has been made.
                 connection.Open();
-                using (SqlTransaction transaction = connection.BeginTransaction())
+                using (SqlTransaction transaction = connection.BeginTransaction(IsolationLevel.ReadUncommitted))
                 {
                     try
                     {
@@ -151,7 +152,7 @@ namespace Ncqrs.Eventing.Storage.SQL
                 // Open connection and begin a transaction so we can
                 // commit or rollback all the changes that has been made.
                 connection.Open();
-                using (SqlTransaction transaction = connection.BeginTransaction())
+                using (SqlTransaction transaction = connection.BeginTransaction(IsolationLevel.ReadUncommitted))
                 {
                     try
                     {
