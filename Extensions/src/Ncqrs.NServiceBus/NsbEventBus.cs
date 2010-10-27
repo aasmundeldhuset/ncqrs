@@ -2,7 +2,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Messaging;
 using System.Text;
+using System.Threading;
 using Ncqrs.Eventing;
 using Ncqrs.Eventing.ServiceModel.Bus;
 using NServiceBus;
@@ -17,14 +19,47 @@ namespace Ncqrs.NServiceBus
     /// </summary>
     public class NsbEventBus : IEventBus
     {
+        private static ILog _log = LogManager.GetLogger(typeof (NsbEventBus));
+        private const int QueueFullWaitInSeconds = 60;
+
         public void Publish(IEvent eventMessage)
         {
-            Bus.Publish(CreateEventMessage(eventMessage));
+            while (true)
+            {
+                try
+                {
+                    Bus.Publish(CreateEventMessage(eventMessage));
+                    return;
+                }
+                catch (MessageQueueException e)
+                {
+                    if (e.MessageQueueErrorCode != MessageQueueErrorCode.InsufficientResources)
+                        throw;
+                    _log.Error("Queue full; waiting for " + QueueFullWaitInSeconds + " seconds");
+                    Thread.Sleep(QueueFullWaitInSeconds * 1000);
+                    _log.Error("(" + QueueFullWaitInSeconds + " seconds has passed since queue was full; continuing)");
+                }
+            }
         }
 
         public void Publish(IEnumerable<IEvent> eventMessages)
         {
-            Bus.Publish(eventMessages.Select(CreateEventMessage).ToArray());
+            while (true)
+            {
+                try
+                {
+                    Bus.Publish(eventMessages.Select(CreateEventMessage).ToArray());
+                    return;
+                }
+                catch (MessageQueueException e)
+                {
+                    if (e.MessageQueueErrorCode != MessageQueueErrorCode.InsufficientResources)
+                        throw;
+                    _log.Error("Queue full; waiting for " + QueueFullWaitInSeconds + " seconds");
+                    Thread.Sleep(QueueFullWaitInSeconds * 1000);
+                    _log.Error("(" + QueueFullWaitInSeconds + " seconds has passed since queue was full; continuing)");
+                }
+            }
         }
 
         public void RegisterHandler<TEvent>(IEventHandler<TEvent> handler) where TEvent : IEvent
