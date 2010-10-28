@@ -1,7 +1,9 @@
 ﻿using System;
 using Ncqrs.Domain.Storage;
+using Ncqrs.Domain.Storage.Caching;
 using Ncqrs.Eventing.Storage;
 using Ncqrs.Eventing.ServiceModel.Bus;
+using Ncqrs.Eventing.Storage.SQL;
 
 namespace Ncqrs.Domain
 {
@@ -14,7 +16,7 @@ namespace Ncqrs.Domain
             var store = NcqrsEnvironment.Get<IEventStore>();
             var bus = NcqrsEnvironment.Get<IEventBus>();
 
-            var repository = new DomainRepository(store, bus);
+            var repository = new DomainRepository(store, bus, new CacheBasedSnapshotStore(new AppFabricCacheProvider()));
             return new UnitOfWork(repository);
         }
     }

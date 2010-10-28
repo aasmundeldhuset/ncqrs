@@ -147,6 +147,14 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\lib\log4net\log4net.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.ApplicationServer.Caching.Client, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\lib\AppFabric\Microsoft.ApplicationServer.Caching.Client.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.ApplicationServer.Caching.Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\lib\AppFabric\Microsoft.ApplicationServer.Caching.Core.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\..\lib\json.net\Newtonsoft.Json.dll</HintPath>
@@ -163,11 +171,16 @@
   <ItemGroup>
     <Compile Include="Domain\Entity.cs" />
     <Compile Include="Domain\EntityMappedByConvention.cs" />
+    <Compile Include="Domain\Storage\Caching\AppFabricCacheProvider.cs" />
+    <Compile Include="Domain\Storage\Caching\ICacheProvider.cs" />
+    <Compile Include="Domain\Storage\Caching\InProcessCacheEntry.cs" />
+    <Compile Include="Domain\Storage\Caching\InProcessCacheProvider.cs" />
     <Compile Include="Domain\Storage\IAggregateRootCreationStrategy.cs" />
     <Compile Include="Domain\Storage\SimpleAggregateRootCreationStrategy.cs" />
     <Compile Include="Eventing\Sourcing\SourcedEventArgs.cs" />
     <Compile Include="Eventing\Sourcing\SourcedEntityEvent.cs" />
     <Compile Include="Eventing\Sourcing\SourcedEventHandlerPredicate.cs" />
+    <Compile Include="Eventing\Storage\SQL\CacheBasedSnapshotStore.cs" />
     <Compile Include="GuidCombGenerator.cs" />
     <Compile Include="Commanding\CommandBase.cs" />
     <Compile Include="Commanding\CommandExecution\CommandExecutorWrapper.cs" />

@@ -3,6 +3,7 @@ using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Reflection;
 using Ncqrs.Eventing.ServiceModel.Bus;
+using Ncqrs.Eventing.Sourcing;
 using Ncqrs.Eventing.Sourcing.Snapshotting;
 using Ncqrs.Eventing.Storage;
 
@@ -10,7 +11,7 @@ namespace Ncqrs.Domain.Storage
 {
     public class DomainRepository : IDomainRepository
     {
-        private const int SnapshotIntervalInEvents = 15;
+        private const int SnapshotIntervalInEvents = 1;
 
         private readonly IEventBus _eventBus;
         private readonly IEventStore _store;
@@ -104,7 +105,7 @@ namespace Ncqrs.Domain.Storage
 
                 restoreMethod.Invoke(aggregateRoot, new object[] { snapshot });
 
-                var events = _store.GetAllEventsSinceVersion(aggregateRoot.EventSourceId, snapshot.EventSourceVersion);
+                var events = SnapshotIntervalInEvents == 1 ? new SourcedEvent[0] : _store.GetAllEventsSinceVersion(aggregateRoot.EventSourceId, snapshot.EventSourceVersion);
                 aggregateRoot.InitializeFromHistory(events);
             }
             else
