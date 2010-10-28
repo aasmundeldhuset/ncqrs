@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Reflection;
@@ -16,6 +17,34 @@ namespace Ncqrs.Domain.Storage
         private readonly IEventStore _store;
         private readonly ISnapshotStore _snapshotStore;
         private readonly IAggregateRootCreationStrategy _aggregateRootCreator = new SimpleAggregateRootCreationStrategy();
+
+        private static IDictionary<Guid, AggregateRoot> _entities = new Dictionary<Guid, AggregateRoot>();
+
+        private static AggregateRoot GetCachedEntity(Guid id)
+        {
+            lock (_entities)
+            {
+                AggregateRoot entity;
+                if (_entities.TryGetValue(id, out entity))
+                    return entity;
+                return null;
+            }
+        }
+
+        private static void CacheEntity(Guid id, AggregateRoot entity)
+        {
+            lock (_entities)
+            {
+                AggregateRoot existing;
+                if (_entities.TryGetValue(id, out existing))
+                {
+                    if (!object.ReferenceEquals(existing, entity))
+                        throw new Exception("Another object is already cached for this id");
+                }
+                else
+                    _entities[id] = entity;
+            }
+        }
 
         public DomainRepository(IEventStore store, IEventBus eventBus, ISnapshotStore snapshotStore = null, IAggregateRootCreationStrategy aggregateRootCreationStrategy = null)
         {
@@ -64,6 +93,11 @@ namespace Ncqrs.Domain.Storage
         /// </returns>
         public AggregateRoot GetById(Type aggregateRootType, Guid eventSourceId)
         {
+            AggregateRoot entity = GetCachedEntity(eventSourceId);
+            if (entity == null)
+                throw new AggregateRootNotFoundException(eventSourceId.ToString());
+            return entity;
+
             AggregateRoot aggregate = null;
 
             if(_snapshotStore != null)
@@ -146,6 +180,8 @@ namespace Ncqrs.Domain.Storage
 
         public void Save(AggregateRoot aggregateRoot)
         {
+            CacheEntity(aggregateRoot.EventSourceId, aggregateRoot);
+
             var events = aggregateRoot.GetUncommittedEvents();
             _store.Save(aggregateRoot);
             _eventBus.Publish(events);
